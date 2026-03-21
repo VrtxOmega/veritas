@@ -59,5 +59,5 @@ jobs:
           print(f\"Confidence traps: {s['cat_b_confidence_trap_accuracy']:.1%}\")
           print(f\"Avg latency:      {s['avg_latency_ms']}ms\")
           print(f\"p95 latency:      {s['p95_latency_ms']}ms\")
-          print(f\"Failures:         {s['total_failures']}\")
+          print(f\"Errors:           {s['errors']}\")
           "
