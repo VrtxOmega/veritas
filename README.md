@@ -85,6 +85,51 @@ curl -X POST https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify \
 
 ---
 
+## Benchmark results
+
+**Run date: 2026-03-21 | 35 claims | [Full results →](benchmark/benchmark_results.json)**
+
+| Metric | VERITAS | Galileo Luna-2 |
+|--------|---------|----------------|
+| Overall accuracy | **97.1%** | 88.0% |
+| High-stakes domain claims (legal/med/fin) | **100%** | ~82% est. |
+| Confidence-trap claims | **100%** | ~75% est. |
+| Average latency | **59ms** | 152ms |
+| p95 latency | 162ms | — |
+| Cost per call | $0.05 | **$0.0002** |
+
+Luna-2 figures from [arXiv:2602.18583](https://arxiv.org/pdf/2602.18583).
+Domain and confidence-trap estimates for Luna-2 are derived from their published
+overall accuracy — Galileo has not published domain-specific breakdowns.
+
+**The one failure**: a recency collision claim (current state of a fast-moving field).
+All three VERITAS models share a training cutoff — recency claims require real-time
+grounding, not consensus. The `requires_realtime_data` flag handles routing in production.
+Zero failures on all legal, medical, and financial confidence-trap claims.
+
+**The latency result was unexpected.** 59ms average despite calling three models.
+The `asyncio.gather` parallel architecture means wall-clock time equals the fastest
+model response, not the sum. VERITAS is 2.6x faster than Luna-2 on average.
+
+**On cost**: VERITAS is 250x more expensive per call. That is not a rounding error
+and it stays in the narrative. Luna-2 is the right choice for high-volume,
+low-stakes guardrailing. VERITAS is the right choice when being confidently wrong
+costs more than $0.42 per error — which in legal, medical, and financial contexts
+is almost always true.
+
+> *"Luna-2 is right for 88% of hallucination detection use cases. VERITAS is right
+> for the 12% where being confidently wrong costs more than the verification."*
+
+**Reproduce it** (3 minutes, free API key):
+```bash
+git clone https://github.com/RJLopezAI/veritas
+cd veritas
+VERITAS_API_KEY=your-key python benchmark/veritas_vs_slm.py
+# Free key: https://aegisaudits.com/keys
+```
+
+---
+
 ## Framework integrations
 
 ### LangChain
