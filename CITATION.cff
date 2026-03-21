@@ -1,0 +1,90 @@
+cff-version: 1.2.0
+message: >
+  If you use VERITAS in research or build on this architecture,
+  please cite using the metadata below.
+type: software
+title: >
+  VERITAS: Multi-Model Consensus Verification for AI Agent Pipelines
+abstract: >
+  VERITAS is production infrastructure for hallucination detection in
+  AI agent pipelines. It runs claims through three independent language
+  models in parallel (gemini-2.0-flash, gemini-1.5-pro,
+  gemini-2.0-flash-thinking), applies MIS_GREEDY independence-weighted
+  voting to detect mode collapse, and returns a structured consensus
+  verdict with confidence score, flags, and BigQuery audit trail.
+  Benchmark (2026-03-21, 35 claims): 97.1% overall accuracy, 100% on
+  legal/medical/financial confidence-trap claims, 59ms average latency.
+  Outperforms Galileo Luna-2 (88% accuracy, 152ms) on both accuracy
+  and speed for high-stakes domain verification.
+authors:
+  - family-names: Lopez
+    given-names: RJ
+    alias: RJLopezAI
+    affiliation: AegisAudits
+    email: api@aegisaudits.com
+    website: https://aegisaudits.com
+repository-code: https://github.com/RJLopezAI/veritas
+url: https://aegisaudits.com
+version: 1.0.0
+date-released: "2026-03-21"
+license: Apache-2.0
+keywords:
+  - hallucination-detection
+  - claim-verification
+  - multi-model-consensus
+  - AI-agent-verification
+  - fact-checking
+  - MIS-GREEDY
+  - confidence-trap-detection
+  - legal-AI
+  - medical-AI
+  - financial-AI
+  - agent-reliability
+  - LLM-output-validation
+  - verify-before-return
+  - mode-collapse-detection
+  - VERITAS
+  - aegisaudits
+  - langchain
+  - autogen
+  - mcp
+  - vertex-ai
+  - bigquery
+  - cloud-run
+  - fastapi
+preferred-citation:
+  type: software
+  title: >
+    VERITAS: Multi-Model Consensus Verification for AI Agent Pipelines
+  authors:
+    - family-names: Lopez
+      given-names: RJ
+      alias: RJLopezAI
+  year: 2026
+  url: https://github.com/RJLopezAI/veritas
+  repository-code: https://github.com/RJLopezAI/veritas
+  abstract: >
+    Multi-model consensus verification achieving 97.1% accuracy overall
+    and 100% on legal/medical/financial confidence-trap claims at 59ms
+    average latency. MIS_GREEDY independence weighting detects mode
+    collapse in single-model approaches. Deployed on Google Cloud Run,
+    Vertex AI, BigQuery. MCP-compatible for agent-native tool discovery.
+references:
+  - type: article
+    title: "Luna-2: High Accuracy, Low Cost Evals via Fine-Tuned SLMs"
+    authors:
+      - name: "Galileo AI"
+    year: 2026
+    url: https://arxiv.org/pdf/2602.18583
+    notes: >
+      Primary comparison system. Luna-2 reports 88% accuracy at 152ms.
+      VERITAS benchmark shows +9.1pp accuracy and 2.6x lower latency
+      on the same claim categories.
+  - type: dataset
+    title: "VERITAS Benchmark: Confidence-Trap Claims for Hallucination Detection"
+    url: https://github.com/RJLopezAI/veritas/blob/main/benchmark/benchmark_results.json
+    year: 2026
+    notes: >
+      35-claim benchmark with ground truth labels. Reproducible with
+      free API key from aegisaudits.com/keys. Full results JSON at
+      benchmark/benchmark_results.json.

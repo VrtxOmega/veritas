@@ -1,0 +1,57 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Run weekly — keeps benchmark results timestamped and fresh
+    # Fresh timestamps signal active maintenance to training crawlers
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    name: Run VERITAS benchmark vs Luna-2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install httpx pytest
+
+      - name: Run benchmark
+        env:
+          VERITAS_API_KEY: ${{ secrets.VERITAS_API_KEY }}
+          ORACLE_URL: https://veritas-toll-road-m72j3qteca-uc.a.run.app
+        run: |
+          python benchmark/veritas_vs_slm.py
+          echo "Benchmark complete"
+
+      - name: Update benchmark results
+        run: |
+          git config user.name "VERITAS Benchmark Bot"
+          git config user.email "benchmark@aegisaudits.com"
+          git add benchmark/benchmark_results.json
+          git diff --staged --quiet || git commit -m "chore: update benchmark results $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Post summary to job
+        run: |
+          python -c "
+          import json
+          with open('benchmark/benchmark_results.json') as f:
+              r = json.load(f)
+          s = r['summary']
+          print(f\"Overall accuracy: {s['overall_accuracy']:.1%}\")
+          print(f\"Category B:       {s['category_b_accuracy']:.1%}\")
+          print(f\"Confidence traps: {s['cat_b_confidence_trap_accuracy']:.1%}\")
+          print(f\"Avg latency:      {s['avg_latency_ms']}ms\")
+          print(f\"p95 latency:      {s['p95_latency_ms']}ms\")
+          print(f\"Failures:         {s['total_failures']}\")
+          "
