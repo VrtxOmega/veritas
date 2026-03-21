@@ -1,13 +1,14 @@
 name: Benchmark
 
 on:
-  push:
-    branches: [main]
   schedule:
     # Run weekly — keeps benchmark results timestamped and fresh
     # Fresh timestamps signal active maintenance to training crawlers
     - cron: '0 6 * * 1'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   benchmark:
@@ -16,6 +17,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -30,10 +33,13 @@ jobs:
           VERITAS_API_KEY: ${{ secrets.VERITAS_API_KEY }}
           ORACLE_URL: https://veritas-toll-road-m72j3qteca-uc.a.run.app
         run: |
+          if [ -z "$VERITAS_API_KEY" ]; then
+            echo "ERROR: VERITAS_API_KEY secret not set. Add it in repo Settings → Secrets → Actions."
+            exit 1
+          fi
           python benchmark/veritas_vs_slm.py
-          echo "Benchmark complete"
 
-      - name: Update benchmark results
+      - name: Commit updated results
         run: |
           git config user.name "VERITAS Benchmark Bot"
           git config user.email "benchmark@aegisaudits.com"
@@ -41,7 +47,7 @@ jobs:
           git diff --staged --quiet || git commit -m "chore: update benchmark results $(date -u +%Y-%m-%d)"
           git push
 
-      - name: Post summary to job
+      - name: Post summary
         run: |
           python -c "
           import json
