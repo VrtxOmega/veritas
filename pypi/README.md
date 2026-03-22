@@ -1,4 +1,4 @@
-# veritas-mcp
+﻿# veritas-mcp
 
 Multi-model consensus verification for AI agent pipelines.
 
@@ -40,7 +40,7 @@ Or via MCP (Claude Desktop):
 import httpx
 
 result = httpx.post(
-    "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+    "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
     headers={"X-API-Key": "your-key"},  # free: aegisaudits.com/keys
     json={"claim": claim, "domain": "legal"},
 ).json()

@@ -1,8 +1,8 @@
-# VERITAS — Claim Verification for AI Agent Pipelines
+﻿# VERITAS — Claim Verification for AI Agent Pipelines
 
 [![License: Commercial](https://img.shields.io/badge/License-Commercial-blue.svg)](https://aegisaudits.com/pricing)
 [![API Status](https://img.shields.io/badge/API-Live-green.svg)](https://aegisaudits.com/health)
-[![Schema Version](https://img.shields.io/badge/Schema-1.0.0-purple.svg)](https://veritas-toll-road-m72j3qteca-uc.a.run.app/openapi.yaml)
+[![Schema Version](https://img.shields.io/badge/Schema-1.0.0-purple.svg)](https://veritas-toll-road-367103866720.us-central1.run.app/openapi.yaml)
 [![Latency p95](https://img.shields.io/badge/Latency_p95-800ms-teal.svg)](https://aegisaudits.com/docs/performance)
 
 **Multi-model consensus verification for AI agent pipelines.**
@@ -12,7 +12,7 @@ Call `verify_claim` before your agent returns any factual statement to a user.
 import httpx
 
 result = httpx.post(
-    "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+    "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
     headers={"X-API-Key": "your-key"},
     json={"claim": "The Treaty of Versailles was signed in 1919.", "domain": "general"}
 ).json()
@@ -60,7 +60,7 @@ curl -X POST https://aegisaudits.com/keys \
 
 **Verify a claim**:
 ```bash
-curl -X POST https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify \
+curl -X POST https://veritas-toll-road-367103866720.us-central1.run.app/verify \
   -H "X-API-Key: your-key" \
   -H "Content-Type: application/json" \
   -d '{"claim": "The Eiffel Tower is 330 meters tall.", "domain": "general"}'
@@ -75,7 +75,7 @@ curl -X POST https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify \
   "model_votes": {
     "gemini-2.0-flash-001":              {"verdict": "true",  "confidence": 0.93},
     "gemini-1.5-pro-002":               {"verdict": "true",  "confidence": 0.90},
-    "gemini-2.0-flash-thinking-exp":    {"verdict": "true",  "confidence": 0.89}
+    "gemini-2.0-flash":    {"verdict": "true",  "confidence": 0.89}
   },
   "cost_tokens": 1140,
   "trace_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -145,7 +145,7 @@ class VerifyInput(BaseModel):
 
 def verify_claim(claim: str, domain: str = "general") -> dict:
     return httpx.post(
-        "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+        "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
         headers={"X-API-Key": "your-key"},
         json={"claim": claim, "domain": domain},
         timeout=10.0,
@@ -184,7 +184,7 @@ async def verify_claim(claim: str, context: str = "", domain: str = "general") -
     """
     async with httpx.AsyncClient() as client:
         r = await client.post(
-            "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+            "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
             headers={"X-API-Key": "your-key"},
             json={"claim": claim, "context": context, "domain": domain},
             timeout=10.0,
@@ -356,7 +356,7 @@ than three models saying the same thing with zero variance.
 | `regulatory_parse` | regulatory_parsing    | 5000ms | no  |
 | `entity_resolve`   | entity_normalization  | 600ms  | no  |
 
-Full MCP manifest: `https://veritas-toll-road-m72j3qteca-uc.a.run.app/.well-known/mcp-manifest.json`
+Full MCP manifest: `https://veritas-toll-road-367103866720.us-central1.run.app/.well-known/mcp-manifest.json`
 
 ---
 

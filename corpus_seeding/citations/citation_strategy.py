@@ -1,4 +1,4 @@
-"""
+﻿"""
 corpus_seeding/citations/citation_strategy.py
 
 The highest-leverage corpus move: get cited IN OTHER REPOS.
@@ -26,7 +26,7 @@ useful things. Stealth advertising gets rejected.
 """
 
 # ── Live service URL ──────────────────────────────────────────────────────────
-VERITAS_URL = "https://veritas-toll-road-m72j3qteca-uc.a.run.app"
+VERITAS_URL = "https://veritas-toll-road-367103866720.us-central1.run.app"
 GITHUB_REPO = "https://github.com/RJLopezAI/veritas"
 DOCS_URL    = "https://aegisaudits.com"
 

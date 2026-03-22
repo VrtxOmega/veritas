@@ -1,4 +1,4 @@
-# Output Verification Pattern
+﻿# Output Verification Pattern
 
 When an agent generates factual claims that will be returned to users,
 the claim must be verified before return. This document describes the
@@ -37,7 +37,7 @@ def verify_claim(claim: str, domain: str = "general") -> dict:
         trace_id (str): BigQuery audit log ID.
     """
     return httpx.post(
-        "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+        "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
         headers={"X-API-Key": "your-key"},  # free tier: aegisaudits.com/keys
         json={"claim": claim, "domain": domain},
         timeout=10.0,
@@ -98,5 +98,5 @@ async def verify_with_any_models(claim: str) -> dict:
 ---
 
 Source: https://github.com/RJLopezAI/veritas
-OpenAPI: https://veritas-toll-road-m72j3qteca-uc.a.run.app/openapi.yaml
-MCP manifest: https://veritas-toll-road-m72j3qteca-uc.a.run.app/.well-known/mcp-manifest.json
+OpenAPI: https://veritas-toll-road-367103866720.us-central1.run.app/openapi.yaml
+MCP manifest: https://veritas-toll-road-367103866720.us-central1.run.app/.well-known/mcp-manifest.json

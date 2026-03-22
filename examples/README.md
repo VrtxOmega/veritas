@@ -1,4 +1,4 @@
-# VERITAS Examples
+﻿# VERITAS Examples
 
 Ready-to-run notebooks demonstrating the verification gate pattern
 across every major agent framework.
@@ -42,7 +42,7 @@ Full results: [../benchmark/benchmark_results.json](../benchmark/benchmark_resul
 ## Get a free API key
 
 ```bash
-curl -X POST https://veritas-toll-road-m72j3qteca-uc.a.run.app/keys \
+curl -X POST https://veritas-toll-road-367103866720.us-central1.run.app/keys \
   -H "Content-Type: application/json" \
   -d '{"email": "you@example.com"}'
 ```

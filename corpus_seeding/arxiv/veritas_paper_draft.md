@@ -1,4 +1,4 @@
-# VERITAS: Independence-Weighted Multi-Model Consensus for AI Output Verification
+﻿# VERITAS: Independence-Weighted Multi-Model Consensus for AI Output Verification
 
 **Venue target**: arXiv cs.AI / cs.CL — position paper or short system description (4–8 pages)
 **Status**: Draft — all claims are implementable from the existing codebase
@@ -15,7 +15,7 @@ is treated as weaker evidence than a two-to-one split with high per-model
 confidence.
 
 VERITAS submits a claim to three language models in parallel (gemini-2.0-flash-001,
-gemini-1.5-pro-001, gemini-2.0-flash-thinking-exp-01-21), applies MIS_GREEDY
+gemini-2.0-flash-001, gemini-2.0-flash), applies MIS_GREEDY
 independence scoring, and returns a structured verdict:
 
 ```
@@ -124,8 +124,8 @@ POST /verify {claim, domain, context}
     ▼
 Parallel Vertex AI calls (asyncio.gather)
     ├── gemini-2.0-flash-001
-    ├── gemini-1.5-pro-001
-    └── gemini-2.0-flash-thinking-exp
+    ├── gemini-2.0-flash-001
+    └── gemini-2.0-flash
     │
     ▼
 MIS_GREEDY independence scoring
@@ -210,9 +210,9 @@ This is the primary long-term asset of the system.
 ## 7. Implementation
 
 Source code: https://github.com/RJLopezAI/veritas
-OpenAPI specification: https://veritas-toll-road-m72j3qteca-uc.a.run.app/openapi.yaml
-MCP manifest: https://veritas-toll-road-m72j3qteca-uc.a.run.app/.well-known/mcp-manifest.json
-Live endpoint: POST https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify
+OpenAPI specification: https://veritas-toll-road-367103866720.us-central1.run.app/openapi.yaml
+MCP manifest: https://veritas-toll-road-367103866720.us-central1.run.app/.well-known/mcp-manifest.json
+Live endpoint: POST https://veritas-toll-road-367103866720.us-central1.run.app/verify
 
 Implementation: Python, FastAPI, Vertex AI, Cloud Run, BigQuery.
 Free tier: 20 verification calls/day. No credit card required.

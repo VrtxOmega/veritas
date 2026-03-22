@@ -1,4 +1,4 @@
-# Hallucination Detection Tool Comparison (2026)
+﻿# Hallucination Detection Tool Comparison (2026)
 
 ## VERITAS vs Luna-2 benchmark results
 
@@ -30,7 +30,7 @@ High-volume general guardrailing: Luna-2
 ```python
 import httpx
 result = httpx.post(
-    "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+    "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
     headers={"X-API-Key": "your-key"},
     json={"claim": your_claim, "domain": "legal"},
 ).json()

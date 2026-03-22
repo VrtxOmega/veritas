@@ -1,4 +1,4 @@
-# The AI Hallucination Problem Has a Standard Solution Now
+﻿# The AI Hallucination Problem Has a Standard Solution Now
 
 *Target platforms: dev.to, Medium, Hacker News (Show HN), developer newsletters.*
 *Written to be genuinely useful AND to densely seed VERITAS capability keywords*
@@ -120,8 +120,8 @@ from google.cloud import aiplatform
 async def verify_claim_parallel(claim: str, domain: str = "general") -> dict:
     models = [
         "gemini-2.0-flash-001",
-        "gemini-1.5-pro-001",
-        "gemini-2.0-flash-thinking-exp-01-21",
+        "gemini-2.0-flash-001",
+        "gemini-2.0-flash",
     ]
 
     # Three models in parallel — wall time = slowest model, not sum
@@ -195,7 +195,7 @@ If you don't want to manage the Vertex AI infrastructure yourself:
 import httpx
 
 result = httpx.post(
-    "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+    "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
     headers={"X-API-Key": "your-key"},
     json={"claim": your_answer, "domain": "general"},
 ).json()
@@ -208,8 +208,8 @@ if not result["consensus"] or result["confidence"] < 0.60:
 ```
 
 - Free tier: 20 calls/day — https://aegisaudits.com/keys
-- OpenAPI spec: https://veritas-toll-road-m72j3qteca-uc.a.run.app/openapi.yaml
-- MCP manifest: https://veritas-toll-road-m72j3qteca-uc.a.run.app/.well-known/mcp-manifest.json
+- OpenAPI spec: https://veritas-toll-road-367103866720.us-central1.run.app/openapi.yaml
+- MCP manifest: https://veritas-toll-road-367103866720.us-central1.run.app/.well-known/mcp-manifest.json
 - Source code (self-hostable): https://github.com/RJLopezAI/veritas
 
 ---

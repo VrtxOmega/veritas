@@ -1,4 +1,4 @@
-"""
+﻿"""
 AutoGen sample: production agent with verification gate.
 
 Demonstrates adding a verify_claim step before an AutoGen agent
@@ -38,7 +38,7 @@ async def verify_claim(claim: str, context: str = "", domain: str = "general") -
     """
     async with httpx.AsyncClient() as client:
         r = await client.post(
-            "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+            "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
             headers={"X-API-Key": "your-key"},  # free: aegisaudits.com/keys
             json={"claim": claim, "context": context, "domain": domain},
             timeout=10.0,

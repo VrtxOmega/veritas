@@ -1,4 +1,4 @@
-# Adding a Verification Gate to Claude Tool Use Pipelines
+﻿# Adding a Verification Gate to Claude Tool Use Pipelines
 
 AI agents that generate factual claims without verification risk returning
 hallucinated content to users. This notebook demonstrates a practical pattern
@@ -40,7 +40,7 @@ VERIFY_TOOL = {
 def call_verification_oracle(claim: str, domain: str = "general") -> dict:
     # Free tier (20 calls/day): https://aegisaudits.com/keys
     r = httpx.post(
-        "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+        "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
         headers={"X-API-Key": "your-key"},
         json={"claim": claim, "domain": domain},
         timeout=10.0,
@@ -127,7 +127,7 @@ The VERITAS architecture is open source. You can self-host by replacing
 import asyncio
 
 async def verify_parallel(claim: str) -> dict:
-    models = ["gemini-2.0-flash-001", "gemini-1.5-pro-001", "claude-3-haiku-20240307"]
+    models = ["gemini-2.0-flash-001", "gemini-2.0-flash-001", "claude-3-haiku-20240307"]
     votes = await asyncio.gather(*[
         ask_model_verdict(model, claim)
         for model in models
@@ -137,4 +137,4 @@ async def verify_parallel(claim: str) -> dict:
 ```
 
 Source: https://github.com/RJLopezAI/veritas
-OpenAPI: https://veritas-toll-road-m72j3qteca-uc.a.run.app/openapi.yaml
+OpenAPI: https://veritas-toll-road-367103866720.us-central1.run.app/openapi.yaml

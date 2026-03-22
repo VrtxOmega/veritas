@@ -1,4 +1,4 @@
-name: Benchmark
+﻿name: Benchmark
 
 on:
   schedule:
@@ -31,7 +31,7 @@ jobs:
       - name: Run benchmark
         env:
           VERITAS_API_KEY: ${{ secrets.VERITAS_API_KEY }}
-          ORACLE_URL: https://veritas-toll-road-m72j3qteca-uc.a.run.app
+          ORACLE_URL: https://veritas-toll-road-367103866720.us-central1.run.app
         run: |
           if [ -z "$VERITAS_API_KEY" ]; then
             echo "ERROR: VERITAS_API_KEY secret not set. Add it in repo Settings → Secrets → Actions."

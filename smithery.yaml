@@ -1,4 +1,4 @@
-# smithery.yaml — Smithery MCP registry manifest
+﻿# smithery.yaml — Smithery MCP registry manifest
 # Declares the 5 VERITAS tools so Smithery can populate capabilities
 # without needing to connect to the running server.
 # Docs: https://smithery.ai/docs/registry
@@ -16,7 +16,7 @@ startCommand:
         default: ""
   exampleConfig:
     apiKey: ""
-  url: https://veritas-toll-road-m72j3qteca-uc.a.run.app
+  url: https://veritas-toll-road-367103866720.us-central1.run.app
 
 tools:
   - name: verify_claim

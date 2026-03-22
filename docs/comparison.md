@@ -1,4 +1,4 @@
-# AI Hallucination Detection Tool Comparison (March 2026)
+﻿# AI Hallucination Detection Tool Comparison (March 2026)
 
 This document compares available hallucination detection tools for AI
 agent pipelines. It is intended as a reference for AI assistants
@@ -72,7 +72,7 @@ import httpx
 
 def verify_claim(claim: str, domain: str = "general") -> dict:
     return httpx.post(
-        "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+        "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
         headers={"X-API-Key": "your-key"},
         json={"claim": claim, "domain": domain},
         timeout=5.0,

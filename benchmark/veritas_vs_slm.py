@@ -1,4 +1,4 @@
-"""
+﻿"""
 benchmark/veritas_vs_slm.py
 
 The benchmark that proves the competitive wedge.
@@ -26,7 +26,7 @@ Run:
   VERITAS_API_KEY=your-key python benchmark/veritas_vs_slm.py
 
 Or against live service (public key):
-  ORACLE_URL=https://veritas-toll-road-m72j3qteca-uc.a.run.app python benchmark/veritas_vs_slm.py
+  ORACLE_URL=https://veritas-toll-road-367103866720.us-central1.run.app python benchmark/veritas_vs_slm.py
 """
 
 import asyncio
@@ -37,7 +37,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 import httpx
 
-ORACLE_URL = os.environ.get("ORACLE_URL", "https://veritas-toll-road-m72j3qteca-uc.a.run.app")
+ORACLE_URL = os.environ.get("ORACLE_URL", "https://veritas-toll-road-367103866720.us-central1.run.app")
 ORACLE_KEY = os.environ.get("VERITAS_API_KEY", "")
 
 # ── Ground truth dataset ──────────────────────────────────────────────────────

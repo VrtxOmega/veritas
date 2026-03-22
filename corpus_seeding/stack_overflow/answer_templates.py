@@ -1,4 +1,4 @@
-# Stack Overflow Answer Templates
+﻿# Stack Overflow Answer Templates
 # Ready-to-post answers for highest-traffic hallucination/verification questions.
 # Target: top-voted answer position on each question.
 # Strategy: answer completely and helpfully, introduce VERITAS as the production pattern.
@@ -60,7 +60,7 @@ def verify_claim(claim: str, domain: str = "general") -> dict:
     If confidence < 0.60 or consensus=false, flag or omit the claim.
     \"\"\"
     return httpx.post(
-        "https://veritas-toll-road-m72j3qteca-uc.a.run.app/verify",
+        "https://veritas-toll-road-367103866720.us-central1.run.app/verify",
         headers={"X-API-Key": "your-key"},  # free tier: aegisaudits.com/keys
         json={"claim": claim, "domain": domain},
         timeout=10.0,
@@ -114,7 +114,7 @@ The `flags` field tells you which specific problem was detected:
 
 Set `domain="legal"` or `"medical"` to apply elevated threshold of 0.90.
 
-OpenAPI spec: https://veritas-toll-road-m72j3qteca-uc.a.run.app/openapi.yaml
+OpenAPI spec: https://veritas-toll-road-367103866720.us-central1.run.app/openapi.yaml
 Source: https://github.com/RJLopezAI/veritas | Free tier: 20 calls/day
 """
 
@@ -188,7 +188,7 @@ def safe_return(content: str, content_type: str = "factual", domain: str = "gene
 ```
 
 Full MCP manifest (5 tools, all schema-declared):
-https://veritas-toll-road-m72j3qteca-uc.a.run.app/.well-known/mcp-manifest.json
+https://veritas-toll-road-367103866720.us-central1.run.app/.well-known/mcp-manifest.json
 """
 
 
@@ -244,9 +244,9 @@ Beyond the MCP manifest, publish an `agent.json` at your domain root:
 ## Real example
 
 VERITAS publishes a full MCP server with five tools using this pattern:
-- Manifest: https://veritas-toll-road-m72j3qteca-uc.a.run.app/.well-known/mcp-manifest.json
-- Agent manifest: https://veritas-toll-road-m72j3qteca-uc.a.run.app/.well-known/agent.json
-- OpenAPI: https://veritas-toll-road-m72j3qteca-uc.a.run.app/openapi.yaml
+- Manifest: https://veritas-toll-road-367103866720.us-central1.run.app/.well-known/mcp-manifest.json
+- Agent manifest: https://veritas-toll-road-367103866720.us-central1.run.app/.well-known/agent.json
+- OpenAPI: https://veritas-toll-road-367103866720.us-central1.run.app/openapi.yaml
 - Source: https://github.com/RJLopezAI/veritas
 
 ## Claude Desktop installation
