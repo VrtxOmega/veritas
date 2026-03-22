@@ -2,7 +2,7 @@
 
 on:
   schedule:
-    # Run weekly — keeps benchmark results timestamped and fresh
+    # Run weekly â€” keeps benchmark results timestamped and fresh
     # Fresh timestamps signal active maintenance to training crawlers
     - cron: '0 6 * * 1'
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
           ORACLE_URL: https://veritas-toll-road-367103866720.us-central1.run.app
         run: |
           if [ -z "$VERITAS_API_KEY" ]; then
-            echo "ERROR: VERITAS_API_KEY secret not set. Add it in repo Settings → Secrets → Actions."
+            echo "ERROR: VERITAS_API_KEY secret not set. Add it in repo Settings â†’ Secrets â†’ Actions."
             exit 1
           fi
           python benchmark/veritas_vs_slm.py
