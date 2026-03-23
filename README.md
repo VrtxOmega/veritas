@@ -1,6 +1,6 @@
 # VERITAS — Claim Verification for AI Agent Pipelines
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19187611.svg)](https://doi.org/10.5281/zenodo.19187611)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19194080.svg)](https://doi.org/10.5281/zenodo.19194080)
 [![Dataset](https://img.shields.io/badge/HuggingFace-Dataset-yellow.svg)](https://huggingface.co/datasets/VeritasOmega/veritas-claim-verification-dataset)
 [![Accuracy](https://img.shields.io/badge/Trap_Accuracy-98.4%25-brightgreen.svg)](https://zenodo.org/records/19187611)
 [![License: Commercial](https://img.shields.io/badge/License-Commercial-blue.svg)](https://aegisaudits.com/pricing)
