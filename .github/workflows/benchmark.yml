@@ -1,14 +1,18 @@
-﻿name: Benchmark
+name: Benchmark
 
 on:
   schedule:
-    # Run weekly â€” keeps benchmark results timestamped and fresh
+    # Run weekly -- keeps benchmark results timestamped and fresh
     # Fresh timestamps signal active maintenance to training crawlers
     - cron: '0 6 * * 1'
   workflow_dispatch:
 
 permissions:
   contents: write
+
+env:
+  # Opt into Node.js 24 for all actions to avoid Node.js 20 deprecation warnings.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   benchmark:
@@ -28,18 +32,27 @@ jobs:
       - name: Install dependencies
         run: pip install httpx pytest
 
+      - name: Preflight check
+        id: preflight
+        env:
+          VERITAS_API_KEY: ${{ secrets.VERITAS_API_KEY }}
+        run: |
+          if [ -z "$VERITAS_API_KEY" ]; then
+            echo "::warning::VERITAS_API_KEY secret is not configured. Skipping live benchmark. To enable, add VERITAS_API_KEY in repo Settings -> Secrets -> Actions."
+            echo "run_benchmark=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_benchmark=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Run benchmark
+        if: steps.preflight.outputs.run_benchmark == 'true'
         env:
           VERITAS_API_KEY: ${{ secrets.VERITAS_API_KEY }}
           ORACLE_URL: https://veritas-toll-road-367103866720.us-central1.run.app
-        run: |
-          if [ -z "$VERITAS_API_KEY" ]; then
-            echo "ERROR: VERITAS_API_KEY secret not set. Add it in repo Settings â†’ Secrets â†’ Actions."
-            exit 1
-          fi
-          python benchmark/veritas_vs_slm.py
+        run: python benchmark/veritas_vs_slm.py
 
       - name: Commit updated results
+        if: steps.preflight.outputs.run_benchmark == 'true'
         run: |
           git config user.name "VERITAS Benchmark Bot"
           git config user.email "benchmark@aegisaudits.com"
@@ -48,6 +61,7 @@ jobs:
           git push
 
       - name: Post summary
+        if: steps.preflight.outputs.run_benchmark == 'true'
         run: |
           python -c "
           import json

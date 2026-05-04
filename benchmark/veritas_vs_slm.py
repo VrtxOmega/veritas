@@ -1,4 +1,4 @@
-﻿"""
+"""
 benchmark/veritas_vs_slm.py
 
 The benchmark that proves the competitive wedge.
@@ -333,6 +333,7 @@ async def run_single(claim: dict, client: httpx.AsyncClient) -> BenchmarkResult:
             json={"claim": claim["claim"], "domain": claim["domain"], "context": ""},
             timeout=20.0,
         )
+        r.raise_for_status()
         result = r.json()
         latency = int((time.perf_counter() - t0) * 1000)
 
