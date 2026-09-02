@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Mapping
 
+from .approval import ApprovalTicket
+
 
 class GateDecision(str, Enum):
     SHADOW_ALLOW = "SHADOW_ALLOW"
@@ -19,6 +21,7 @@ class GateResult:
     reason: str
     action_digest: str
     approved_digest: str | None = None
+    ticket_id: str | None = None
 
 
 def _canonical_bytes(value: Mapping[str, Any]) -> bytes:
@@ -62,11 +65,15 @@ class AgentGate:
 
     This class has *no execution capability*. Every result fixes
     ``execution_authorized`` to False. ``SHADOW_ALLOW`` means only that the
-    proposed action still matches the action that passed the shadow approval
-    checkpoint.
+    proposed action still matches the action captured at the shadow approval
+    checkpoint and that its single-use ticket has not previously been consumed.
     """
 
+    def __init__(self) -> None:
+        self._consumed_ticket_ids: set[str] = set()
+
     def approve_shadow(self, action: Mapping[str, Any]) -> GateResult:
+        """Legacy digest-only checkpoint retained for the initial v0.1 API."""
         digest = _digest_action(action)
         return GateResult(
             decision=GateDecision.SHADOW_ALLOW,
@@ -76,12 +83,17 @@ class AgentGate:
             approved_digest=digest,
         )
 
+    def issue_ticket(self, action: Mapping[str, Any]) -> ApprovalTicket:
+        """Create a fresh single-use ticket bound to the exact canonical action."""
+        return ApprovalTicket.issue(_digest_action(action))
+
     def reevaluate(
         self,
         action: Mapping[str, Any],
         *,
         approved_digest: str,
     ) -> GateResult:
+        """Legacy digest comparison. Prefer ``reevaluate_ticket`` for new callers."""
         current_digest = _digest_action(action)
         if current_digest != approved_digest:
             return GateResult(
@@ -98,4 +110,56 @@ class AgentGate:
             reason="action unchanged since approval",
             action_digest=current_digest,
             approved_digest=approved_digest,
+        )
+
+    def reevaluate_ticket(
+        self,
+        action: Mapping[str, Any],
+        *,
+        ticket: ApprovalTicket,
+    ) -> GateResult:
+        """Consume a valid ticket exactly once and fail closed on any mismatch."""
+        current_digest = _digest_action(action)
+
+        if not ticket.integrity_valid():
+            return GateResult(
+                decision=GateDecision.DENY,
+                execution_authorized=False,
+                reason="approval ticket integrity failure",
+                action_digest=current_digest,
+                approved_digest=ticket.action_digest,
+                ticket_id=ticket.ticket_id,
+            )
+
+        if ticket.ticket_id in self._consumed_ticket_ids:
+            return GateResult(
+                decision=GateDecision.DENY,
+                execution_authorized=False,
+                reason="approval ticket replay detected",
+                action_digest=current_digest,
+                approved_digest=ticket.action_digest,
+                ticket_id=ticket.ticket_id,
+            )
+
+        # Consume before returning either mismatch or success. A ticket is an
+        # attempt-specific capability and must not become reusable after a deny.
+        self._consumed_ticket_ids.add(ticket.ticket_id)
+
+        if current_digest != ticket.action_digest:
+            return GateResult(
+                decision=GateDecision.DENY,
+                execution_authorized=False,
+                reason="action mutated after approval",
+                action_digest=current_digest,
+                approved_digest=ticket.action_digest,
+                ticket_id=ticket.ticket_id,
+            )
+
+        return GateResult(
+            decision=GateDecision.SHADOW_ALLOW,
+            execution_authorized=False,
+            reason="single-use approval ticket matched exact action",
+            action_digest=current_digest,
+            approved_digest=ticket.action_digest,
+            ticket_id=ticket.ticket_id,
         )
