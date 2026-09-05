@@ -149,6 +149,14 @@ Please submit results in both human-readable form and the machine-readable struc
 
 `evaluation/agent-gate-evaluation-result.schema.json`
 
+From the specimen checkout, use the activated environment to check your report:
+
+```text
+python ../veritas-evaluation-kit/evaluation/validate_evaluation_package.py /path/to/result.json
+```
+
+Replace `/path/to/result.json` with your report's path (quote paths containing spaces). The command checks the package safeguards first, then the report's schema and frozen-target fields. It exits nonzero on an invalid report or unreadable file. A valid report prints `Report structure is valid for the frozen target; evidence and calibration observations are not verified.` Schema validation does not verify timestamps, artifact contents, evaluator independence, imported code, or whether calibration actually occurred; review those against preserved logs.
+
 For each case, distinguish:
 
 - `expected`

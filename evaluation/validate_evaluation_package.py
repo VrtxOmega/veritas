@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 
 ROOT = Path(__file__).resolve().parent
 SCHEMA_PATH = ROOT / "agent-gate-evaluation-result.schema.json"
@@ -39,8 +40,19 @@ def validate_package() -> Draft202012Validator:
 
 
 def main() -> None:
-    validate_package()
-    print("Agent Gate evaluation package schema and synthetic example are valid.")
+    parser = argparse.ArgumentParser(description="Validate the kit and optionally a report's JSON structure; this does not verify evidence.")
+    parser.add_argument("report", nargs="?", type=Path, help="Evaluator result JSON to check against the frozen-target schema")
+    args = parser.parse_args()
+    try:
+        validator = validate_package()
+        if args.report is not None:
+            validator.validate(load_json(args.report))
+    except (OSError, ValueError, ValidationError) as error:
+        parser.error(str(error))
+    if args.report is None:
+        print("Agent Gate evaluation package schema and synthetic example are valid.")
+    else:
+        print("Report structure is valid for the frozen target; evidence and calibration observations are not verified.")
 
 
 if __name__ == "__main__":

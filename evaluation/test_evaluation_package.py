@@ -86,6 +86,26 @@ class EvaluationPackageTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("must remain explicitly synthetic", result.stderr)
 
+    def test_report_cli_from_another_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            report_path = Path(directory) / "report with spaces.json"
+            command = [sys.executable, str(ROOT / "validate_evaluation_package.py"), str(report_path)]
+            for kind in ("valid", "wrong_target", "uncalibrated_clean", "malformed", "missing"):
+                with self.subTest(kind=kind):
+                    report = copy.deepcopy(self.example)
+                    if kind == "wrong_target":
+                        report["target"]["commit"] = "0" * 40
+                    if kind == "uncalibrated_clean":
+                        report["summary"]["result"] = "clean_within_tested_scope"
+                        report["calibration"]["deliberate_negative_observed"] = False
+                    report_path.write_text("{" if kind == "malformed" else json.dumps(report))
+                    if kind == "missing":
+                        report_path.unlink()
+                    result = subprocess.run(command, cwd=directory, capture_output=True, text=True, timeout=30)
+                    self.assertEqual(result.returncode == 0, kind == "valid", result.stderr)
+                    if kind == "valid":
+                        self.assertIn("observations are not verified", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
