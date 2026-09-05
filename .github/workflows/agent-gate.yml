@@ -1,0 +1,35 @@
+name: Agent Gate
+
+on:
+  pull_request:
+    paths:
+      - "agent_gate/**"
+      - "tests/test_agent_gate*.py"
+      - "AGENT_GATE_DEMONSTRATOR.md"
+      - ".github/workflows/agent-gate.yml"
+  push:
+    branches:
+      - agent-gate-v0.1
+    paths:
+      - "agent_gate/**"
+      - "tests/test_agent_gate*.py"
+      - "AGENT_GATE_DEMONSTRATOR.md"
+      - ".github/workflows/agent-gate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependency
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Compile Agent Gate
+        run: python -m compileall -q agent_gate
+      - name: Run Agent Gate regressions
+        run: python -m pytest -q tests/test_agent_gate.py tests/test_agent_gate_contracts.py
