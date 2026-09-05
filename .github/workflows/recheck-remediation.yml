@@ -1,0 +1,70 @@
+name: Recheck remediation differential controls
+on:
+  pull_request:
+    paths:
+      - "agent_gate/**"
+      - "tests/test_agent_gate_recheck_errors.py"
+      - ".github/workflows/recheck-remediation.yml"
+permissions:
+  contents: read
+jobs:
+  differential:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: 256daeb85dae7ac004ae9893df858f58c87ec523
+          path: specimen
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install pytest
+      - name: New regression must detect the frozen pre-fix behavior
+        working-directory: specimen
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+        run: |
+          mkdir -p ../results
+          set +e
+          PYTHONPATH="$PWD" python -m pytest -q --import-mode=importlib --noconftest -c /dev/null ../candidate/tests/test_agent_gate_recheck_errors.py --junitxml=../results/frozen-tests.xml > ../results/frozen-tests.txt 2>&1
+          code=$?
+          set -e
+          cat ../results/frozen-tests.txt
+          test "$code" -eq 1
+          python - <<'PY'
+          from collections import Counter
+          import xml.etree.ElementTree as ET
+          cases = ET.parse('../results/frozen-tests.xml').findall('.//testcase')
+          failures = [c for c in cases if c.find('failure') is not None]
+          expected = {'test_malformed_recheck_burns_valid_ticket': 16,
+                      'test_unexpected_digest_exception_is_not_swallowed_or_reusable': 2,
+                      'test_storage_failure_does_not_turn_invalid_input_into_allow': 2,
+                      'test_burn_survives_a_new_process': 1}
+          observed = dict(Counter(c.attrib['name'].split('[')[0] for c in failures))
+          if len(cases) != 25 or observed != expected or any(c.find('error') is not None or c.find('skipped') is not None for c in cases):
+              raise SystemExit('Frozen regression failures did not match the expected semantic cases')
+          print('EXPECTED RED CONTROL: 21 specified failures and 4 positive/integrity controls passed')
+          PY
+      - name: Candidate passes old and new regressions
+        working-directory: candidate
+        run: python -m pytest -q tests/test_agent_gate*.py --junitxml=../results/candidate-tests.xml
+      - name: Unmodified external probe and repaired follow-on
+        run: >-
+          python -B candidate/evaluation/reproduce_msaleme_20260905.py
+          --specimen candidate
+          --expected-commit "$(git -C candidate rev-parse HEAD)"
+          --expected-float-retry DENY
+          --output results/candidate-replay.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: recheck-remediation-python-${{ matrix.python }}
+          path: results/
+          if-no-files-found: error
