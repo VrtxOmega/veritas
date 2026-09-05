@@ -1,0 +1,147 @@
+# Evaluating VERITAS Agent Gate v0.1
+
+This package is for independent evaluation of the frozen Agent Gate v0.1 specimen.
+
+## Immutable target
+
+Evaluate this exact commit:
+
+`256daeb85dae7ac004ae9893df858f58c87ec523`
+
+Do not substitute a moving branch for the target under test. If a later commit is evaluated, report it as a different target.
+
+The implementation under evaluation is intentionally non-executing. Every result keeps `execution_authorized = false`.
+
+## Stable evaluator surface
+
+```python
+from agent_gate import AgentGate, ControlApproval, ReplayStore, digest_action
+```
+
+Use:
+
+- `digest_action(action)` to calculate the canonical action digest used by local approval bindings.
+- `AgentGate.evaluate_and_issue(...)` to evaluate a typed action plus presented approvals and, when eligible, issue a single-use ticket.
+- `AgentGate.reevaluate_ticket(...)` for the immediate pre-execution shadow recheck.
+
+## Minimum instrument calibration
+
+A useful external instrument must demonstrate that it can observe both sides of the decision boundary.
+
+Before reporting a clean result, show at least:
+
+1. one legitimate acceptance control that produces the expected contract-qualified shadow allow; and
+2. one deliberately broken semantic control that the instrument detects as a failure.
+
+A harness that only produces denials is insufficient evidence because a reject-everything implementation can pass negative cases for the wrong reason.
+
+## Canonical positive control
+
+For `filesystem.write`, construct an action under `workspace/` with `content_sha256` and present exactly these controls:
+
+- `scope`
+- `change`
+
+Requirements:
+
+- the two controls are bound to the exact action digest;
+- two distinct presented `approver_id` values are used;
+- the ticket is rechecked against the exact same action;
+- the expected result is a contract-qualified shadow allow with `execution_authorized = false`.
+
+## Required hostile baseline
+
+At minimum, exercise the following declared hostile cases and record expected versus observed behavior:
+
+1. Duplicate one required control so cardinality is correct but the distinct control set is wrong.
+2. Present the correct required controls using only one approver identifier.
+3. Substitute an approval bound to a different action.
+4. Mutate the target after ticket issuance and before recheck.
+5. Replay a ticket after successful consumption.
+6. Retry the original action after a mutated-action recheck has already burned the ticket.
+7. Present an unknown operation type.
+8. Attempt path traversal outside the allowed namespace.
+
+These are baseline regressions, not a limit on evaluation. Independent hostile cases are strongly encouraged.
+
+## Independent hostile cases
+
+If you identify a new case, report it separately from the declared baseline. Include enough information to reproduce it exactly:
+
+- case identifier;
+- evaluator-defined claim being tested;
+- input action;
+- approvals/control artifacts used;
+- ticket lifecycle, if applicable;
+- expected behavior;
+- observed behavior;
+- whether the result is a newly discovered defect, a declared limitation, or an instrument issue;
+- minimal reproduction steps.
+
+Do not classify a known non-claim as a newly discovered defect merely because it is exploitable within the stated boundary.
+
+## Explicit v0.1 boundaries
+
+The target does **not** claim to establish:
+
+- authenticated approver identity;
+- trusted approval issuers;
+- resistance to a caller that can mint arbitrary local `ControlApproval` objects;
+- real human or principal separation of duty;
+- approval freshness or expiry;
+- external policy-engine enforcement;
+- factual truth of external evidence;
+- production safety or security certification;
+- distributed replay safety beyond the configured SQLite replay store;
+- execution authority.
+
+Distinct approver IDs mean distinct presented identifiers only.
+
+## Result reporting
+
+Please submit results in both human-readable form and the machine-readable structure defined by:
+
+`evaluation/agent-gate-evaluation-result.schema.json`
+
+For each case, distinguish:
+
+- `expected`
+- `observed`
+- `instrument_observed_failure`
+- `classification`
+
+Recommended classifications are:
+
+- `acceptance_control`
+- `declared_baseline_pass`
+- `declared_baseline_fail`
+- `independent_hostile_case`
+- `known_boundary`
+- `instrument_issue`
+- `inconclusive`
+
+## Evidence discipline
+
+A clean evaluation is evidence about the tested claims, target, and method only. It is not a production security certification.
+
+A failure should preserve the failing fixture before remediation. A remediation should be evaluated as a new commit and should not rewrite the historical result for v0.1.
+
+If the evaluator discovers a harness defect during testing, record that separately rather than silently correcting history.
+
+## Reproduction metadata
+
+Please record:
+
+- repository
+- exact target commit
+- evaluator name/handle
+- evaluator repository or harness version/commit, if applicable
+- execution environment
+- date/time in UTC
+- positive-control result
+- deliberate-negative calibration result
+- declared baseline results
+- independent hostile cases
+- raw logs or artifact references when available
+
+The goal is not to maximize pass counts. The goal is to produce a falsifiable record that another party can inspect and reproduce.

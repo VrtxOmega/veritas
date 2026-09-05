@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/VrtxOmega/veritas/blob/main/evaluation/agent-gate-evaluation-result.schema.json",
+  "title": "VERITAS Agent Gate External Evaluation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "target",
+    "evaluator",
+    "instrument",
+    "environment",
+    "evaluated_at_utc",
+    "calibration",
+    "cases",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit"],
+      "properties": {
+        "repository": {
+          "const": "VrtxOmega/veritas"
+        },
+        "commit": {
+          "const": "256daeb85dae7ac004ae9893df858f58c87ec523"
+        }
+      }
+    },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name_or_handle", "relationship"],
+      "properties": {
+        "name_or_handle": {"type": "string", "minLength": 1},
+        "relationship": {
+          "type": "string",
+          "enum": [
+            "independent",
+            "collaborator",
+            "project_author",
+            "unknown"
+          ]
+        },
+        "contact_or_profile": {"type": ["string", "null"]}
+      }
+    },
+    "instrument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version_or_commit"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "repository": {"type": ["string", "null"]},
+        "version_or_commit": {"type": "string", "minLength": 1}
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["description"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "evaluated_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "calibration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["positive_control_observed", "deliberate_negative_observed"],
+      "properties": {
+        "positive_control_observed": {"type": "boolean"},
+        "deliberate_negative_observed": {"type": "boolean"},
+        "notes": {"type": ["string", "null"]}
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "source",
+          "claim",
+          "expected",
+          "observed",
+          "instrument_observed_failure",
+          "classification"
+        ],
+        "properties": {
+          "case_id": {"type": "string", "minLength": 1},
+          "source": {
+            "type": "string",
+            "enum": ["declared_baseline", "evaluator_proposed"]
+          },
+          "claim": {"type": "string", "minLength": 1},
+          "input": {"type": ["object", "array", "string", "null"]},
+          "expected": {"type": "string", "minLength": 1},
+          "observed": {"type": "string", "minLength": 1},
+          "instrument_observed_failure": {"type": "boolean"},
+          "classification": {
+            "type": "string",
+            "enum": [
+              "acceptance_control",
+              "declared_baseline_pass",
+              "declared_baseline_fail",
+              "independent_hostile_case",
+              "known_boundary",
+              "instrument_issue",
+              "inconclusive"
+            ]
+          },
+          "reproduction": {"type": ["string", "null"]},
+          "artifact_refs": {
+            "type": "array",
+            "items": {"type": "string"},
+            "uniqueItems": true
+          },
+          "notes": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["result", "claims_supported", "claims_broken"],
+      "properties": {
+        "result": {
+          "type": "string",
+          "enum": ["clean_within_tested_scope", "defect_found", "instrument_issue", "inconclusive"]
+        },
+        "claims_supported": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "claims_broken": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "notes": {"type": ["string", "null"]}
+      }
+    }
+  }
+}
