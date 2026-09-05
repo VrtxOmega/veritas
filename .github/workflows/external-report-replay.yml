@@ -1,0 +1,41 @@
+name: External report project-side replay
+on:
+  pull_request:
+    paths:
+      - "evaluation/**"
+      - "agent_gate/**"
+      - ".github/workflows/external-report-replay.yml"
+permissions:
+  contents: read
+jobs:
+  frozen-reproduction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: kit
+      - uses: actions/checkout@v4
+        with:
+          ref: 256daeb85dae7ac004ae9893df858f58c87ec523
+          path: specimen
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install author-suite test dependency
+        run: python -m pip install pytest
+      - name: Original author tests (setup only)
+        working-directory: specimen
+        run: python -m pytest -q tests/test_agent_gate.py tests/test_agent_gate_contracts.py
+      - name: Reproduce original report and known follow-on before remediation
+        run: >-
+          python -B kit/evaluation/reproduce_msaleme_20260905.py
+          --specimen specimen
+          --expected-commit 256daeb85dae7ac004ae9893df858f58c87ec523
+          --expected-float-retry SHADOW_ALLOW
+          --output results/frozen-reproduction.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: project-side-frozen-reproduction
+          path: results/frozen-reproduction.json
+          if-no-files-found: error
