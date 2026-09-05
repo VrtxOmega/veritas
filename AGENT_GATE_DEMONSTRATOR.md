@@ -65,4 +65,4 @@ v0.1 does **not** establish:
 - network/distributed replay safety beyond the configured SQLite store;
 - execution authority.
 
-`ControlApproval` uses a local digest to make binding semantics falsifiable; it is not an identity attestation. Signed identities, issuer trust, separation of duty, freshness, and external policy/evidence binding are later hardening layers.
+`ControlApproval` uses a local digest to make binding semantics falsifiable; it is not an identity attestation. The distinct-approver check therefore demonstrates **distinct presented identifiers**, not proof that two real humans or principals approved the action. Signed identities, issuer trust, separation of duty, freshness, and external policy/evidence binding are later hardening layers.
