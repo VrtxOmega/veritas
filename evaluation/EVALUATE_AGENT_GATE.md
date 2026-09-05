@@ -12,6 +12,44 @@ Do not substitute a moving branch for the target under test. If a later commit i
 
 The implementation under evaluation is intentionally non-executing. Every result keeps `execution_authorized = false`.
 
+## Fresh-clone setup and package validation
+
+Prerequisites: Git, Python 3.12 with `venv` and `pip`, and network access to GitHub and PyPI for setup. Agent Gate itself uses the Python standard library (including SQLite); package validation requires `jsonschema`, and the author regression suite requires `pytest`. No API keys or external services are required for these checks.
+
+Keep the evaluator package and frozen specimen in separate sibling checkouts: the frozen commit predates `evaluation/`. The kit can receive documentation/tooling fixes; record its full commit separately from the immutable target. From an empty working directory:
+
+```text
+git clone https://github.com/VrtxOmega/veritas.git veritas-evaluation-kit
+git -C veritas-evaluation-kit checkout --detach
+git -C veritas-evaluation-kit rev-parse HEAD
+git clone https://github.com/VrtxOmega/veritas.git veritas-v0.1
+git -C veritas-v0.1 checkout --detach 256daeb85dae7ac004ae9893df858f58c87ec523
+python -m venv .venv
+```
+
+Activate with `source .venv/bin/activate` on POSIX shells, or `.venv\Scripts\Activate.ps1` in PowerShell. If activation is unavailable, invoke `.venv/bin/python` or `.venv\Scripts\python.exe` explicitly in place of `python`.
+
+```text
+python -m pip install --disable-pip-version-check jsonschema pytest
+python veritas-evaluation-kit/evaluation/validate_evaluation_package.py
+```
+
+Expected output: `Agent Gate evaluation package schema and synthetic example are valid.` This checks the Draft 2020-12 schema and bundled fixture, not an evaluator's report or the running specimen. `example-result.json` is synthetic, was not executed, and must never count as external validation, including its illustrative calibration booleans.
+
+Before running any harness, enter the specimen checkout and verify its identity:
+
+```text
+cd veritas-v0.1
+git rev-parse HEAD
+git status --porcelain
+python -c "import agent_gate; print(agent_gate.__file__)"
+python -m pytest -q tests/test_agent_gate.py tests/test_agent_gate_contracts.py
+```
+
+Stop if HEAD is not the full frozen SHA above, tracked files are modified, or the import resolves outside this specimen's `agent_gate` directory. Do not add local modules that shadow specimen modules. Python may generate untracked `__pycache__` directories. Run from this directory so Python imports this specimen, and repeat identity checks after evaluation. An external harness must also record the resolved import location in its own process; starting in this directory alone does not guarantee its import path.
+
+Record Python/dependency versions (`python --version`, `python -m pip freeze`) and import location with the results. The schema pins the reported repository and commit; it cannot prove which code a harness actually imported. The author suite passing is a setup check, not independent evaluation or instrument calibration. To reproduce a kit revision later, check out its recorded full SHA in `veritas-evaluation-kit`; never substitute that SHA for the specimen target.
+
 ## Stable evaluator surface
 
 ```python
@@ -35,6 +73,12 @@ Before reporting a clean result, show at least:
 
 A harness that only produces denials is insufficient evidence because a reject-everything implementation can pass negative cases for the wrong reason.
 
+For deliberate-negative calibration, preserve a separate instrument fixture with a known semantic violation (for example, an intentionally fabricated `SHADOW_ALLOW` for duplicate required controls where the oracle expects `DENY`). Run that fixture through the same evaluator comparison/reporting path and require an observable failure, such as a failed assertion or nonzero exit. Record the injected violation, expected and observed failure, command, and logs separately from results on the frozen specimen. Do not modify the specimen for calibration.
+
+Merely observing an expected denial on a hostile input does not demonstrate that the instrument detects a broken result. A calibration failure detected as intended is not a specimen defect. The schema requires both calibration flags to be true for `clean_within_tested_scope`; the flags alone do not prove calibration occurred. If calibration is missing and no other conclusion is established, report `inconclusive`. Preserve a demonstrated defect or instrument issue under its appropriate summary even when calibration is incomplete.
+
+Use `calibration.notes` for calibration procedure and artifact references. For ordinary cases, `instrument_observed_failure` means the observed behavior violated the case's expected semantics: an expected denial that is correctly observed is a baseline pass with this flag false. The deliberately broken calibration fixture should trigger this flag in the instrument's calibration output; keep that output separate from specimen findings. The bundled synthetic example is illustrative and must not supply observed values for a real report.
+
 ## Canonical positive control
 
 For `filesystem.write`, construct an action under `workspace/` with `content_sha256` and present exactly these controls:
@@ -48,6 +92,8 @@ Requirements:
 - two distinct presented `approver_id` values are used;
 - the ticket is rechecked against the exact same action;
 - the expected result is a contract-qualified shadow allow with `execution_authorized = false`.
+
+Use an action shaped as `{"type": "filesystem.write", "target": "workspace/example.txt", "parameters": {"content_sha256": "abc123"}}`, matching the author fixture. Construct approvals with `ControlApproval.issue(control_id=..., approver_id=..., action_digest=digest_action(action))`. Unpack `(result, ticket)` from `evaluate_and_issue(action, approvals=approvals)`; require `result.decision.value == "SHADOW_ALLOW"`, `result.execution_authorized is False`, and a non-null ticket. Then call `reevaluate_ticket(action, ticket=ticket)` on the same gate/store and require the same decision and non-execution flag. Use a fresh gate/store per unrelated case; retain the same store for replay and burned-ticket cases. The action describes a shadow operation; no file is written.
 
 ## Required hostile baseline
 
@@ -102,6 +148,14 @@ Distinct approver IDs mean distinct presented identifiers only.
 Please submit results in both human-readable form and the machine-readable structure defined by:
 
 `evaluation/agent-gate-evaluation-result.schema.json`
+
+From the specimen checkout, use the activated environment to check your report:
+
+```text
+python ../veritas-evaluation-kit/evaluation/validate_evaluation_package.py /path/to/result.json
+```
+
+Replace `/path/to/result.json` with your report's path (quote paths containing spaces). The command checks the package safeguards first, then the report's schema and frozen-target fields. It exits nonzero on an invalid report or unreadable file. A valid report prints `Report structure is valid for the frozen target; evidence and calibration observations are not verified.` Schema validation does not verify timestamps, artifact contents, evaluator independence, imported code, or whether calibration actually occurred; review those against preserved logs.
 
 For each case, distinguish:
 

@@ -15,6 +15,25 @@
     "cases",
     "summary"
   ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "summary": {"properties": {"result": {"const": "clean_within_tested_scope"}}}
+        }
+      },
+      "then": {
+        "properties": {
+          "calibration": {
+            "properties": {
+              "positive_control_observed": {"const": true},
+              "deliberate_negative_observed": {"const": true}
+            }
+          }
+        }
+      }
+    }
+  ],
   "properties": {
     "schema_version": {
       "const": "1.0.0"
