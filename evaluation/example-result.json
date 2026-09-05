@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0.0",
+  "target": {
+    "repository": "VrtxOmega/veritas",
+    "commit": "256daeb85dae7ac004ae9893df858f58c87ec523"
+  },
+  "evaluator": {
+    "name_or_handle": "EXAMPLE_ONLY_NOT_EVIDENCE",
+    "relationship": "project_author",
+    "contact_or_profile": null
+  },
+  "instrument": {
+    "name": "documentation-example",
+    "repository": null,
+    "version_or_commit": "synthetic"
+  },
+  "environment": {
+    "description": "Synthetic documentation fixture only; no evaluation was executed."
+  },
+  "evaluated_at_utc": "1970-01-01T00:00:00Z",
+  "calibration": {
+    "positive_control_observed": true,
+    "deliberate_negative_observed": true,
+    "notes": "Values are illustrative schema examples, not empirical observations."
+  },
+  "cases": [
+    {
+      "case_id": "EXAMPLE-POSITIVE",
+      "source": "declared_baseline",
+      "claim": "A legitimate acceptance control is observable.",
+      "input": "synthetic example only",
+      "expected": "contract-qualified shadow allow",
+      "observed": "synthetic example value; not executed",
+      "instrument_observed_failure": false,
+      "classification": "acceptance_control",
+      "reproduction": null,
+      "artifact_refs": [],
+      "notes": "Documentation fixture only."
+    },
+    {
+      "case_id": "EXAMPLE-NEGATIVE",
+      "source": "declared_baseline",
+      "claim": "A deliberately broken semantic control is observable.",
+      "input": "synthetic example only",
+      "expected": "denial or evaluator-detected semantic failure",
+      "observed": "synthetic example value; not executed",
+      "instrument_observed_failure": true,
+      "classification": "declared_baseline_pass",
+      "reproduction": null,
+      "artifact_refs": [],
+      "notes": "Documentation fixture only."
+    }
+  ],
+  "summary": {
+    "result": "inconclusive",
+    "claims_supported": [],
+    "claims_broken": [],
+    "notes": "Synthetic schema-validation fixture. It is not Trust Lab evidence and not an Agent Gate evaluation result."
+  }
+}
