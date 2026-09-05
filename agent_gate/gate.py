@@ -8,6 +8,7 @@ from typing import Any, Mapping, Sequence
 
 from .approval import ApprovalTicket
 from .contracts import ControlApproval, OperationRegistry
+from .replay import ReplayStore
 
 
 class GateDecision(str, Enum):
@@ -62,9 +63,9 @@ class AgentGate:
     False.
     """
 
-    def __init__(self, registry: OperationRegistry | None = None) -> None:
-        self._consumed_ticket_ids: set[str] = set()
+    def __init__(self, registry: OperationRegistry | None = None, replay_store: ReplayStore | None = None) -> None:
         self.registry = registry or OperationRegistry()
+        self.replay_store = replay_store or ReplayStore()
 
     def approve_shadow(self, action: Mapping[str, Any]) -> GateResult:
         """Legacy digest-only checkpoint; not a contract-qualified approval."""
@@ -91,16 +92,15 @@ class AgentGate:
         return GateResult(GateDecision.SHADOW_ALLOW, False, "action unchanged since approval", current_digest, approved_digest)
 
     def reevaluate_ticket(self, action: Mapping[str, Any], *, ticket: ApprovalTicket) -> GateResult:
-        """Consume a valid ticket exactly once and fail closed on any mismatch."""
+        """Atomically consume a valid ticket once and fail closed on mismatch."""
         current_digest = digest_action(action)
         if not ticket.integrity_valid():
             return GateResult(GateDecision.DENY, False, "approval ticket integrity failure", current_digest, ticket.action_digest, ticket.ticket_id)
-        if ticket.ticket_id in self._consumed_ticket_ids:
-            return GateResult(GateDecision.DENY, False, "approval ticket replay detected", current_digest, ticket.action_digest, ticket.ticket_id)
 
-        # Burn on first use even when the action mismatches: a denied probe must not
-        # leave a capability reusable against the originally approved action.
-        self._consumed_ticket_ids.add(ticket.ticket_id)
+        # Consume before checking action equality. A mutation probe burns the ticket,
+        # so it cannot be retried later against the originally approved action.
+        if not self.replay_store.consume_once(ticket.ticket_id):
+            return GateResult(GateDecision.DENY, False, "approval ticket replay detected", current_digest, ticket.action_digest, ticket.ticket_id)
         if current_digest != ticket.action_digest:
             return GateResult(GateDecision.DENY, False, "action mutated after approval", current_digest, ticket.action_digest, ticket.ticket_id)
         return GateResult(GateDecision.SHADOW_ALLOW, False, "single-use approval ticket matched exact action", current_digest, ticket.action_digest, ticket.ticket_id)
