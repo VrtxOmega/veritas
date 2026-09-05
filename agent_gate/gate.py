@@ -93,7 +93,15 @@ class AgentGate:
 
     def reevaluate_ticket(self, action: Mapping[str, Any], *, ticket: ApprovalTicket) -> GateResult:
         """Atomically consume a valid ticket once and fail closed on mismatch."""
-        current_digest = digest_action(action)
+        try:
+            current_digest = digest_action(action)
+        except Exception:
+            # A malformed action still consumes this attempt. Only an intact
+            # ticket may identify replay state; do not burn a forged ticket ID.
+            # Re-raise, including on store failure: an exception is never allow.
+            if ticket.integrity_valid():
+                self.replay_store.consume_once(ticket.ticket_id)
+            raise
         if not ticket.integrity_valid():
             return GateResult(GateDecision.DENY, False, "approval ticket integrity failure", current_digest, ticket.action_digest, ticket.ticket_id)
 
