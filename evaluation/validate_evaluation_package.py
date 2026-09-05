@@ -17,7 +17,7 @@ def load_json(path: Path) -> dict:
         return json.load(handle)
 
 
-def main() -> None:
+def validate_package() -> Draft202012Validator:
     schema = load_json(SCHEMA_PATH)
     example = load_json(EXAMPLE_PATH)
 
@@ -25,16 +25,21 @@ def main() -> None:
     Draft202012Validator(schema).validate(example)
 
     target = example["target"]
-    assert target["repository"] == EXPECTED_REPOSITORY
-    assert target["commit"] == EXPECTED_COMMIT
-
     schema_target = schema["properties"]["target"]["properties"]
-    assert schema_target["repository"]["const"] == EXPECTED_REPOSITORY
-    assert schema_target["commit"]["const"] == EXPECTED_COMMIT
+    for field, expected in (("repository", EXPECTED_REPOSITORY), ("commit", EXPECTED_COMMIT)):
+        if target[field] != expected or schema_target[field].get("const") != expected:
+            raise ValueError(f"Evaluation package target {field} must remain {expected}")
 
-    assert example["evaluator"]["name_or_handle"] == "EXAMPLE_ONLY_NOT_EVIDENCE"
-    assert example["summary"]["result"] == "inconclusive"
+    if example["evaluator"]["name_or_handle"] != "EXAMPLE_ONLY_NOT_EVIDENCE":
+        raise ValueError("Bundled example must remain explicitly synthetic")
+    if example["summary"]["result"] != "inconclusive":
+        raise ValueError("Bundled synthetic example must remain inconclusive")
 
+    return Draft202012Validator(schema)
+
+
+def main() -> None:
+    validate_package()
     print("Agent Gate evaluation package schema and synthetic example are valid.")
 
 
