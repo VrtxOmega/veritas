@@ -39,7 +39,7 @@ The hostile regression set requires denial for:
 - unknown operation type;
 - path traversal outside the allowed namespace.
 
-These cases are pinned in `tests/test_agent_gate_contracts.py`.
+These cases are pinned in `tests/test_agent_gate_contracts.py` and run by `.github/workflows/agent-gate.yml`.
 
 ## External harness surface
 
